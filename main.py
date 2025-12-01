@@ -1,10 +1,12 @@
 import time
-from collections.abc import Callable
 
 import machine
 
 from mcp23017 import VirtualPin, MCP23017
 
+PULL_HIGH = True
+ON = False
+OFF = True
 
 class Motor:
     def __init__(
@@ -13,7 +15,7 @@ class Motor:
         *,
         on: Callable[[], bool],
         off: Callable[[], bool],
-        default: bool = False
+        default: bool = OFF
     ):
         self._pin = pin
         self.on = on
@@ -22,9 +24,9 @@ class Motor:
 
     def poll(self):
         if self.on():
-            self._pin.output(True)
+            self._pin.output(ON)
         elif self.off():
-            self._pin.output(False)
+            self._pin.output(OFF)
 
 
 class Switch:
@@ -32,7 +34,7 @@ class Switch:
         self, switch: VirtualPin, led: VirtualPin, *, value: Callable[[], bool]
     ):
         self.switch = switch
-        self.switch.input(True)
+        self.switch.input(PULL_HIGH)
         self.led = led
         self.get_value = value
         self.poll()
@@ -59,7 +61,7 @@ class DebouncedPin:
         self._pin = pin
         self._threshold = threshold
         self._last_time = 0
-        self._pin.input(True)
+        self._pin.input(PULL_HIGH)
         self._value = self._pin.value()
 
     @property
@@ -72,9 +74,9 @@ class DebouncedPin:
             if self._last_time == 0:
                 self._last_time = time.time()
             elif (time.time() - self._last_time) > self._threshold:
-                self._value = True
+                self._value = ON
         else:
-            self._value = False
+            self._value = OFF
 
 
 class Sensor:
@@ -165,7 +167,7 @@ class Crossover(Base):
 
         motor = Motor(
             motor,
-            default=False,
+            default=OFF,
             on=lambda: switch_diverging.value,
             off=lambda: switch_straight.value,
         )
@@ -213,13 +215,13 @@ class SingleSlip(Base):
         # todo: this logic
         motor1 = Motor(
             motor1,
-            default=False,
+            default=OFF,
             on=lambda: switch_straight.value or switch_partial.value,
             off=lambda: switch_diverging.value,
         )
         motor2 = Motor(
             motor2,
-            default=False,
+            default=OFF,
             on=lambda: switch_straight.value or switch_partial.value,
             off=lambda: switch_diverging.value,
         )
@@ -233,13 +235,13 @@ i2c = machine.I2C(1)
 MCP = MCP23017(i2c)
 
 sidings = Turnout(
-    motor=MCP.porta[0],
-    switch_straight=MCP.portb[0],
-    switch_diverging=MCP.portb[1],
-    sensor_straight=MCP.portb[2],
-    sensor_diverging=MCP.portb[3],
-    led_straight=MCP.porta[1],
-    led_diverging=MCP.porta[2],
+    motor=MCP[8],
+    switch_straight=MCP[0],
+    switch_diverging=MCP[1],
+    sensor_straight=MCP[2],
+    sensor_diverging=MCP[3],
+    led_straight=MCP[9],
+    led_diverging=MCP[10],
 )
 
 while True:
