@@ -50,7 +50,7 @@ class LED:
         self.poll()
 
     def poll(self):
-        self.led.output(not self.get_value())
+        self.led.output(self.get_value())
 
 
 class DebouncedPin:
@@ -81,11 +81,11 @@ class Sensor:
 
     @property
     def straight(self):
-        return bool(self._straight) and not bool(self._diverging)
+        return bool(self._straight)
     
     @property
     def diverging(self):
-        return bool(self._diverging) and not bool(self._straight)
+        return bool(self._diverging)
 
 
 class Base:
@@ -117,7 +117,7 @@ class Turnout(Base):
         sensor = Sensor(straight=sensor_straight, diverging=sensor_diverging)
 
         led_straight = LED(led_straight, value=lambda: sensor.straight)
-        led_diverging = LED(led_diverging, value=lambda: sensor.straight)
+        led_diverging = LED(led_diverging, value=lambda: sensor.diverging)
 
         switch_straight = Switch(
             switch_straight,
@@ -129,7 +129,7 @@ class Turnout(Base):
 
         motor = Motor(
             motor,
-            default=sensor.straight,
+            default=not sensor_diverging.value(),
             straight=lambda: switch_straight.pressed,
             diverging=lambda: switch_diverging.pressed,
         )
@@ -239,8 +239,8 @@ if True:
         motor=MCP[0],
         switch_straight=MCP[15],
         switch_diverging=MCP[14],
-        sensor_straight=MCP[12],
-        sensor_diverging=MCP[13],
+        sensor_straight=MCP[13],
+        sensor_diverging=MCP[12],
         led_straight=MCP[1],
         led_diverging=MCP[2],
     )
