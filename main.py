@@ -41,7 +41,7 @@ class Switch:
 
     @property
     def value(self):
-        return self.switch.value()
+        return not self.switch.value()
 
     def poll(self):
         self.led.output(self.get_value())
@@ -70,7 +70,7 @@ class DebouncedPin:
         return self._value
 
     def poll(self):
-        if self._pin.value:
+        if self._pin.value():
             if self._last_time == 0:
                 self._last_time = time.time()
             elif (time.time() - self._last_time) > self._threshold:
@@ -130,7 +130,7 @@ class Turnout(Base):
 
         motor = Motor(
             motor,
-            default=sensor.diverging,
+            default=not sensor.diverging,
             on=lambda: switch_diverging.value,
             off=lambda: switch_straight.value,
         )
@@ -232,20 +232,22 @@ class SingleSlip(Base):
 
 
 i2c = machine.I2C(1)
+
 MCP = MCP23017(i2c)
 
-sidings = Turnout(
-    motor=MCP[8],
-    switch_straight=MCP[0],
-    switch_diverging=MCP[1],
-    sensor_straight=MCP[2],
-    sensor_diverging=MCP[3],
-    led_straight=MCP[9],
-    led_diverging=MCP[10],
-)
+if True:
+    sidings = Turnout(
+        motor=MCP[0],
+        switch_straight=MCP[15],
+        switch_diverging=MCP[14],
+        sensor_straight=MCP[13],
+        sensor_diverging=MCP[12],
+        led_straight=MCP[1],
+        led_diverging=MCP[2],
+    )
 
-while True:
-    sidings.poll_input()
-    time.sleep(0.1)
-    sidings.poll_output()
-    time.sleep(0.1)
+    while True:
+        sidings.poll_input()
+        time.sleep(0.1)
+        sidings.poll_output()
+        time.sleep(0.1)
