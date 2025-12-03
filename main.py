@@ -62,7 +62,7 @@ class DebouncedPin:
         return self._value
 
     def poll(self):
-        if self._pin.value() is OFF:
+        if self._pin.value() == 0:
             if self._last_time == 0:
                 self._last_time = time.time()
             elif (time.time() - self._last_time) > self._threshold:
@@ -232,8 +232,8 @@ if True:
         motor=MCP[0],
         switch_straight=MCP[15],
         switch_diverging=MCP[14],
-        sensor_straight=MCP[13],
-        sensor_diverging=MCP[12],
+        sensor_straight=MCP[12],
+        sensor_diverging=MCP[13],
         led_straight=MCP[1],
         led_diverging=MCP[2],
     )
