@@ -33,17 +33,21 @@ class Motor:
 
 class Switch:
     def __init__(
-        self, switch: VirtualPin, led: VirtualPin, *, value: Callable[[], bool]
+        self, switch: VirtualPin
     ):
         self.switch = switch
         self.switch.input(PULL_HIGH)
-        self.led = led
-        self.get_value = value
-        self.poll()
 
     @property
     def pressed(self):
         return not self.switch.value()
+
+
+class LED:
+    def __init__(self, led: VirtualPin, *, value: Callable[[], bool]):
+        self.led = led
+        self.get_value = value
+        self.poll()
 
     def poll(self):
         self.led.output(not self.get_value())
@@ -77,25 +81,25 @@ class Sensor:
 
     @property
     def straight(self):
-        return bool(self._straight)
+        return bool(self._straight) and not bool(self._diverging)
     
     @property
     def diverging(self):
-        return bool(self._diverging)
+        return bool(self._diverging) and not bool(self._straight)
 
 
 class Base:
-    def __init__(self, *, motors: list[Motor], switches: list[Switch]):
+    def __init__(self, *, motors: list[Motor], leds: list[LED]):
         self.motors = motors
-        self.switches = switches
+        self.leds = leds
 
     def poll_input(self):
         for motor in self.motors:
             motor.poll()
 
     def poll_output(self):
-        for switch in self.switches:
-            switch.poll()
+        for led in self.leds:
+            led.poll()
 
 
 class Turnout(Base):
@@ -112,12 +116,15 @@ class Turnout(Base):
     ):
         sensor = Sensor(straight=sensor_straight, diverging=sensor_diverging)
 
+        led_straight = LED(led_straight, value=lambda: sensor.straight)
+        led_diverging = LED(led_diverging, value=lambda: sensor.straight)
+
         switch_straight = Switch(
-            switch_straight, led_straight, value=lambda: sensor.straight
+            switch_straight,
         )
 
         switch_diverging = Switch(
-            switch_diverging, led_diverging, value=lambda: sensor.diverging
+            switch_diverging,
         )
 
         motor = Motor(
@@ -126,7 +133,7 @@ class Turnout(Base):
             straight=lambda: switch_straight.pressed,
             diverging=lambda: switch_diverging.pressed,
         )
-        super().__init__(motors=[motor], switches=[switch_straight, switch_diverging])
+        super().__init__(motors=[motor], leds=[led_straight, led_diverging])
 
 
 class Crossover(Base):
