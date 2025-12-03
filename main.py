@@ -2,6 +2,8 @@ import time
 
 import machine
 
+# from collections.abc import Callable
+
 from mcp23017 import VirtualPin, MCP23017
 
 PULL_HIGH = True
@@ -13,19 +15,19 @@ class Motor:
         self,
         pin: VirtualPin,
         *,
-        on: Callable[[], bool],
-        off: Callable[[], bool],
-        default: bool = OFF
+        straight: Callable[[], bool],
+        diverging: Callable[[], bool],
+        default: bool
     ):
         self._pin = pin
-        self.on = on
-        self.off = off
+        self.straight = straight
+        self.diverging = diverging
         self._pin.output(default)
 
     def poll(self):
-        if self.on():
+        if self.straight():
             self._pin.output(ON)
-        elif self.off():
+        elif self.diverging():
             self._pin.output(OFF)
 
 
@@ -40,20 +42,11 @@ class Switch:
         self.poll()
 
     @property
-    def value(self):
+    def pressed(self):
         return not self.switch.value()
 
     def poll(self):
-        self.led.output(self.get_value())
-
-
-class LED:
-    def __init__(self, pin: VirtualPin, *, default: bool):
-        self._pin = pin
-        self._pin.output(default)
-
-    def output(self, value: bool):
-        self._pin.output(value)
+        self.led.output(not self.get_value())
 
 
 class DebouncedPin:
@@ -64,20 +57,18 @@ class DebouncedPin:
         self._pin.input(PULL_HIGH)
         self._value = self._pin.value()
 
-    @property
-    def value(self):
+    def __bool__(self):
         self.poll()
         return self._value
 
     def poll(self):
-        if self._pin.value():
+        if self._pin.value() is OFF:
             if self._last_time == 0:
                 self._last_time = time.time()
             elif (time.time() - self._last_time) > self._threshold:
-                self._value = ON
+                self._value = True
         else:
-            self._value = OFF
-
+            self._value = False
 
 class Sensor:
     def __init__(self, *, straight: VirtualPin, diverging: VirtualPin):
@@ -86,11 +77,11 @@ class Sensor:
 
     @property
     def straight(self):
-        return self._straight.value
-
+        return bool(self._straight)
+    
     @property
     def diverging(self):
-        return self._diverging.value
+        return bool(self._diverging)
 
 
 class Base:
@@ -124,15 +115,16 @@ class Turnout(Base):
         switch_straight = Switch(
             switch_straight, led_straight, value=lambda: sensor.straight
         )
+
         switch_diverging = Switch(
             switch_diverging, led_diverging, value=lambda: sensor.diverging
         )
 
         motor = Motor(
             motor,
-            default=not sensor.diverging,
-            on=lambda: switch_diverging.value,
-            off=lambda: switch_straight.value,
+            default=sensor.straight,
+            straight=lambda: switch_straight.pressed,
+            diverging=lambda: switch_diverging.pressed,
         )
         super().__init__(motors=[motor], switches=[switch_straight, switch_diverging])
 
@@ -168,8 +160,8 @@ class Crossover(Base):
         motor = Motor(
             motor,
             default=OFF,
-            on=lambda: switch_diverging.value,
-            off=lambda: switch_straight.value,
+            straight=lambda: bool(switch_straight),
+            diverging=lambda: bool(switch_diverging),
         )
         super().__init__(motors=[motor], switches=[switch_straight, switch_diverging])
 
@@ -216,14 +208,14 @@ class SingleSlip(Base):
         motor1 = Motor(
             motor1,
             default=OFF,
-            on=lambda: switch_straight.value or switch_partial.value,
-            off=lambda: switch_diverging.value,
+            straight=lambda: switch_straight.pressed or switch_partial.pressed,
+            diverging=lambda: switch_diverging.pressed,
         )
         motor2 = Motor(
             motor2,
             default=OFF,
-            on=lambda: switch_straight.value or switch_partial.value,
-            off=lambda: switch_diverging.value,
+            straight=lambda: switch_straight.pressed or switch_partial.pressed,
+            diverging=lambda: switch_diverging.pressed,
         )
         super().__init__(
             motors=[motor1, motor2],
