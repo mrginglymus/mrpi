@@ -243,33 +243,45 @@ class Sidings(Base):
         sensor4_diverging: VirtualPin,
     ):
 
-        motor1 = Motor(
+        self.motor1 = Motor(
             motor=motor1, straight=[sensor1_straight], diverging=[sensor1_diverging]
         )
-        motor2 = Motor(
+        self.motor2 = Motor(
             motor=motor2, straight=[sensor2_straight], diverging=[sensor2_diverging]
         )
-        motor3 = Motor(
+        self.motor3 = Motor(
             motor=motor3, straight=[sensor3_straight], diverging=[sensor3_diverging]
         )
-        motor4 = Motor(
+        self.motor4 = Motor(
             motor=motor4, straight=[sensor4_straight], diverging=[sensor4_diverging]
         )
 
-        switch1 = Switch(switch=switch1, led=led1, config={motor1: True, motor2: True})
-        switch2 = Switch(
-            switch=switch2, led=led2, config={motor1: True, motor2: False, motor3: True}
+        self.switch1 = Switch(
+            switch=switch1, led=led1, config={self.motor1: True, self.motor2: True}
         )
-        switch3 = Switch(
+        self.switch2 = Switch(
+            switch=switch2,
+            led=led2,
+            config={self.motor1: True, self.motor2: False, self.motor3: True},
+        )
+        self.switch3 = Switch(
             switch=switch3,
             led=led3,
-            config={motor1: True, motor2: False, motor3: False},
+            config={self.motor1: True, self.motor2: False, self.motor3: False},
         )
-        switch4 = Switch(
-            switch=switch4, led=led4, config={motor1: False, motor4: False}
+        self.switch4 = Switch(
+            switch=switch4, led=led4, config={self.motor1: False, self.motor4: False}
         )
-        switch5 = Switch(switch=switch5, led=led5, config={motor1: False, motor4: True})
+        self.switch5 = Switch(
+            switch=switch5, led=led5, config={self.motor1: False, self.motor4: True}
+        )
 
         super().__init__(
-            switches=[switch1, switch2, switch3, switch4, switch5],
+            switches=[
+                self.switch1,
+                self.switch2,
+                self.switch3,
+                self.switch4,
+                self.switch5,
+            ],
         )
