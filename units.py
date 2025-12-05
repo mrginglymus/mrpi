@@ -45,13 +45,16 @@ class Switch:
         self.led = led
         self.config = config
 
+    def push(self):
+        for motor, diverging in self.config.items():
+            if diverging:
+                motor.set_diverging()
+            else:
+                motor.set_straight()
+
     def poll_switch(self):
         if not self.switch.value():
-            for motor, diverging in self.config.items():
-                if diverging:
-                    motor.set_diverging()
-                else:
-                    motor.set_straight()
+            self.push()
 
     def poll_state(self):
         self.led.output(
