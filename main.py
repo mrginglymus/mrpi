@@ -25,10 +25,10 @@ if True:
         sensor1_diverging=MCP21[15],
         sensor2_straight=MCP21[12],
         sensor2_diverging=MCP21[13],
-        sensor3_straight=MCP21[11],
-        sensor3_diverging=MCP21[10],
-        sensor4_straight=MCP21[8],
-        sensor4_diverging=MCP21[9],
+        sensor3_straight=MCP21[10],
+        sensor3_diverging=MCP21[11],
+        sensor4_straight=MCP21[9],
+        sensor4_diverging=MCP21[8],
         switch1=MCP22[15],
         switch2=MCP22[14],
         switch3=MCP22[13],
@@ -50,7 +50,7 @@ if True:
     #    led_diverging=MCP20[2],
     #)
 
-    while False:
+    while True:
         sidings.poll_switches()
         time.sleep(0.1)
         sidings.poll_state()
