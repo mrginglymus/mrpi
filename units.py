@@ -58,7 +58,7 @@ class Switch:
 
     def poll_state(self):
         self.led.output(
-            all(
+            not all(
                 getattr(motor, "diverging" if diverging else "straight")
                 for motor, diverging in self.config.items()
             )
