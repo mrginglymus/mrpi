@@ -11,11 +11,13 @@ OFF = True
 class Motor:
     def __init__(
         self,
+        name,
         *,
         motor: VirtualPin,
         straight: list[VirtualPin],
         diverging: list[VirtualPin],
     ):
+        self.name = name
         self._motor = motor
         self._straight = [DebouncedPin(straight) for straight in straight]
         self._diverging = [DebouncedPin(diverging) for diverging in diverging]
@@ -35,6 +37,14 @@ class Motor:
     def set_diverging(self):
         self._motor.output(OFF)
 
+    @property
+    def state(self):
+        if self.straight:
+            return "straight"
+        if self.diverging:
+            return "diverging"
+        return None
+
 
 class Switch:
     def __init__(
@@ -44,6 +54,7 @@ class Switch:
         self.switch.input(PULL_HIGH)
         self.led = led
         self.config = config
+        self.poll_state()
 
     def push(self):
         for motor, diverging in self.config.items():
@@ -59,7 +70,7 @@ class Switch:
     def poll_state(self):
         self.led.output(
             not all(
-                getattr(motor, "diverging" if diverging else "straight")
+                motor.state == ("diverging" if diverging else "straight")
                 for motor, diverging in self.config.items()
             )
         )
@@ -114,6 +125,7 @@ class Turnout(Base):
     ):
 
         motor = Motor(
+            "Motor",
             motor=motor,
             straight=[sensor_straight],
             diverging=[sensor_diverging],
@@ -148,6 +160,7 @@ class PairedTurnout(Base):
     ):
 
         motor = Motor(
+            "Motor",
             motor=motor,
             straight=[sensor1_straight, sensor2_straight],
             diverging=[sensor1_diverging, sensor2_diverging],
@@ -186,11 +199,13 @@ class Crossover(Base):
     ):
 
         motor1 = Motor(
+            "Motor 1",
             motor=motor1,
             straight=[sensor1_straight, sensor3_straight],
             diverging=[sensor1_diverging, sensor3_diverging],
         )
         motor2 = Motor(
+            "Motor 2",
             motor=motor2,
             straight=[sensor2_straight],
             diverging=[sensor2_diverging],
@@ -244,16 +259,28 @@ class Sidings(Base):
     ):
 
         self.motor1 = Motor(
-            motor=motor1, straight=[sensor1_straight], diverging=[sensor1_diverging]
+            "Motor 1",
+            motor=motor1,
+            straight=[sensor1_straight],
+            diverging=[sensor1_diverging],
         )
         self.motor2 = Motor(
-            motor=motor2, straight=[sensor2_straight], diverging=[sensor2_diverging]
+            "Motor 2",
+            motor=motor2,
+            straight=[sensor2_straight],
+            diverging=[sensor2_diverging],
         )
         self.motor3 = Motor(
-            motor=motor3, straight=[sensor3_straight], diverging=[sensor3_diverging]
+            "Motor 3",
+            motor=motor3,
+            straight=[sensor3_straight],
+            diverging=[sensor3_diverging],
         )
         self.motor4 = Motor(
-            motor=motor4, straight=[sensor4_straight], diverging=[sensor4_diverging]
+            "Motor 4",
+            motor=motor4,
+            straight=[sensor4_straight],
+            diverging=[sensor4_diverging],
         )
 
         self.switch1 = Switch(
@@ -285,3 +312,7 @@ class Sidings(Base):
                 self.switch5,
             ],
         )
+
+    def print_state(self):
+        for motor in [self.motor1, self.motor2, self.motor3, self.motor4]:
+            print(motor.name, motor.state)
