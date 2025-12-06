@@ -25,12 +25,15 @@ class Motor:
             pin.input(PULL_HIGH)
         for pin in self._diverging:
             pin.input(PULL_HIGH)
-        self._motor.output(self.straight)
+        if self.straight:
+            self.set_straight()
+        elif self.diverging:
+            self.set_diverging()
 
     @property
     def straight(self):
-        return all(not pin.value() for pin in self._straight) and  all(
-             pin.value() for pin in self._diverging
+        return all(not pin.value() for pin in self._straight) and all(
+            pin.value() for pin in self._diverging
         )
 
     def set_straight(self):
@@ -38,8 +41,8 @@ class Motor:
 
     @property
     def diverging(self):
-        return all(not pin.value() for pin in self._diverging) and  all(
-             pin.value() for pin in self._straight
+        return all(not pin.value() for pin in self._diverging) and all(
+            pin.value() for pin in self._straight
         )
 
     def set_diverging(self):
