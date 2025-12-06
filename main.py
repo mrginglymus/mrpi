@@ -14,8 +14,6 @@ MCP21 = MCP23017(i2c1, address=0x21)
 MCP22 = MCP23017(i2c1, address=0x22)
 
 if True:
-    Dummy = MCP21[4]
-    DummyS = MCP20[15]
     sidings = Sidings(
         motor1=MCP21[0],
         motor2=MCP21[1],
