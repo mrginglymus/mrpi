@@ -11,13 +11,11 @@ OFF = True
 class Motor:
     def __init__(
         self,
-        name,
         *,
         motor: VirtualPin,
         straight: list[VirtualPin],
         diverging: list[VirtualPin],
     ):
-        self.name = name
         self._motor = motor
         self._straight = straight
         self._diverging = diverging
@@ -139,7 +137,6 @@ class Turnout(Base):
     ):
 
         motor = Motor(
-            "Motor",
             motor=motor,
             straight=[sensor_straight],
             diverging=[sensor_diverging],
@@ -174,7 +171,6 @@ class PairedTurnout(Base):
     ):
 
         motor = Motor(
-            "Motor",
             motor=motor,
             straight=[sensor1_straight, sensor2_straight],
             diverging=[sensor1_diverging, sensor2_diverging],
@@ -213,13 +209,11 @@ class Crossover(Base):
     ):
 
         motor1 = Motor(
-            "Motor 1",
             motor=motor1,
             straight=[sensor1_straight, sensor3_straight],
             diverging=[sensor1_diverging, sensor3_diverging],
         )
         motor2 = Motor(
-            "Motor 2",
             motor=motor2,
             straight=[sensor2_straight],
             diverging=[sensor2_diverging],
@@ -273,25 +267,21 @@ class Sidings(Base):
     ):
 
         self.motor1 = Motor(
-            "Motor 1",
             motor=motor1,
             straight=[sensor1_straight],
             diverging=[sensor1_diverging],
         )
         self.motor2 = Motor(
-            "Motor 2",
             motor=motor2,
             straight=[sensor2_straight],
             diverging=[sensor2_diverging],
         )
         self.motor3 = Motor(
-            "Motor 3",
             motor=motor3,
             straight=[sensor3_straight],
             diverging=[sensor3_diverging],
         )
         self.motor4 = Motor(
-            "Motor 4",
             motor=motor4,
             straight=[sensor4_straight],
             diverging=[sensor4_diverging],
@@ -326,7 +316,3 @@ class Sidings(Base):
                 self.switch5,
             ],
         )
-
-    def print_state(self):
-        for motor in [self.motor1, self.motor2, self.motor3, self.motor4]:
-            print(motor.name, motor.state)
