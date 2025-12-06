@@ -136,22 +136,22 @@ class Turnout(Base):
         led_diverging: VirtualPin,
     ):
 
-        motor = Motor(
+        self.motor = Motor(
             motor=motor,
             straight=[sensor_straight],
             diverging=[sensor_diverging],
         )
 
-        switch_straight = Switch(
-            switch=switch_straight, led=led_straight, config={motor: False}
+        self.switch_straight = Switch(
+            switch=switch_straight, led=led_straight, config={self.motor: False}
         )
 
-        switch_diverging = Switch(
-            switch=switch_diverging, led=led_diverging, config={motor: True}
+        self.switch_diverging = Switch(
+            switch=switch_diverging, led=led_diverging, config={self.motor: True}
         )
 
         super().__init__(
-            switches=[switch_straight, switch_diverging],
+            switches=[self.switch_straight, self.switch_diverging],
         )
 
 
@@ -170,21 +170,21 @@ class PairedTurnout(Base):
         led_diverging: VirtualPin,
     ):
 
-        motor = Motor(
+        self.motor = Motor(
             motor=motor,
             straight=[sensor1_straight, sensor2_straight],
             diverging=[sensor1_diverging, sensor2_diverging],
         )
 
-        switch_straight = Switch(
-            switch=switch_straight, led=led_straight, config={motor: False}
+        self.switch_straight = Switch(
+            switch=switch_straight, led=led_straight, config={self.motor: False}
         )
-        switch_diverging = Switch(
-            switch=switch_diverging, led=led_diverging, config={motor: True}
+        self.switch_diverging = Switch(
+            switch=switch_diverging, led=led_diverging, config={self.motor: True}
         )
 
         super().__init__(
-            switches=[switch_straight, switch_diverging],
+            switches=[self.switch_straight, self.switch_diverging],
         )
 
 
@@ -208,33 +208,35 @@ class Crossover(Base):
         sensor3_diverging: VirtualPin,
     ):
 
-        motor1 = Motor(
+        self.motor1 = Motor(
             motor=motor1,
             straight=[sensor1_straight, sensor3_straight],
             diverging=[sensor1_diverging, sensor3_diverging],
         )
-        motor2 = Motor(
+        self.motor2 = Motor(
             motor=motor2,
             straight=[sensor2_straight],
             diverging=[sensor2_diverging],
         )
 
-        switch_straight = Switch(
+        self.switch_straight = Switch(
             switch=switch_straight,
             led=led_straight,
-            config={motor1: False, motor2: False},
+            config={self.motor1: False, motor2: False},
         )
-        switch_diverging = Switch(
+        self.switch_diverging = Switch(
             switch=switch_diverging,
             led=led_diverging,
-            config={motor1: True, motor2: True},
+            config={self.motor1: True, motor2: True},
         )
-        switch_partial = Switch(
-            switch=switch_partial, led=led_partial, config={motor1: True, motor2: False}
+        self.switch_partial = Switch(
+            switch=switch_partial,
+            led=led_partial,
+            config={self.motor1: True, self.motor2: False},
         )
 
         super().__init__(
-            switches=[switch_straight, switch_partial, switch_diverging],
+            switches=[self.switch_straight, self.switch_partial, self.switch_diverging],
         )
 
 
