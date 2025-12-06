@@ -21,12 +21,16 @@ class Motor:
         self._motor = motor
         self._straight = straight
         self._diverging = diverging
+        for pin in self._straight:
+            pin.input(PULL_HIGH)
+        for pin in self._diverging:
+            pin.input(PULL_HIGH)
         self._motor.output(self.straight)
 
     @property
     def straight(self):
-        return all(pin.value() for pin in self._straight) and not any(
-            pin.value() for pin in self._diverging
+        return all(not pin.value() for pin in self._straight) and  all(
+             pin.value() for pin in self._diverging
         )
 
     def set_straight(self):
@@ -34,8 +38,8 @@ class Motor:
 
     @property
     def diverging(self):
-        return all(pin.value() for pin in self._diverging) and not any(
-            pin.value() for pin in self._straight
+        return all(not pin.value() for pin in self._diverging) and  all(
+             pin.value() for pin in self._straight
         )
 
     def set_diverging(self):
@@ -59,6 +63,7 @@ class Switch:
         self.led = led
         self.config = config
         self._last_time = 0
+        self._last_state = self.current_state
         self.led.output(self.current_state)
 
     def push(self):
@@ -84,14 +89,19 @@ class Switch:
         current_state = self.current_state
         if not current_state:
             self._last_time = 0
+            self._last_state = False
             return False
         else:
+            if self._last_state:
+                return self._last_state
             if self._last_time == 0:
                 self._last_time = time.time()
                 return False
             if (time.time() - self._last_time) > 0.5:
+                self._last_time = 0
+                self._last_state = True
                 return True
-            return False
+            return self._last_state
 
     def poll_state(self):
         self.led.output(self.state)
