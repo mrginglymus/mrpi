@@ -19,20 +19,24 @@ class Motor:
     ):
         self.name = name
         self._motor = motor
-        self._straight = [DebouncedPin(straight) for straight in straight]
-        self._diverging = [DebouncedPin(diverging) for diverging in diverging]
+        self._straight = straight
+        self._diverging = diverging
         self._motor.output(self.straight)
 
     @property
     def straight(self):
-        return all(self._straight) and not all(self._diverging)
+        return all(pin.value() for pin in self._straight) and not any(
+            pin.value() for pin in self._diverging
+        )
 
     def set_straight(self):
         self._motor.output(ON)
 
     @property
     def diverging(self):
-        return all(self._diverging) and not all(self._straight)
+        return all(pin.value() for pin in self._diverging) and not any(
+            pin.value() for pin in self._straight
+        )
 
     def set_diverging(self):
         self._motor.output(OFF)
@@ -54,7 +58,8 @@ class Switch:
         self.switch.input(PULL_HIGH)
         self.led = led
         self.config = config
-        self.poll_state()
+        self._last_time = 0
+        self.led.output(self.current_state)
 
     def push(self):
         for motor, diverging in self.config.items():
@@ -67,35 +72,29 @@ class Switch:
         if not self.switch.value():
             self.push()
 
-    def poll_state(self):
-        self.led.output(
-            all(
-                motor.state == ("diverging" if diverging else "straight")
-                for motor, diverging in self.config.items()
-            )
+    @property
+    def current_state(self) -> bool:
+        return all(
+            motor.state == ("diverging" if diverging else "straight")
+            for motor, diverging in self.config.items()
         )
 
-
-class DebouncedPin:
-    def __init__(self, pin: VirtualPin, *, threshold: float = 0.2):
-        self._pin = pin
-        self._threshold = threshold
-        self._last_time = 0
-        self._pin.input(PULL_HIGH)
-        self._value = self._pin.value()
-
-    def __bool__(self):
-        self.poll()
-        return self._value
-
-    def poll(self):
-        if self._pin.value() == 0:
+    @property
+    def state(self) -> bool:
+        current_state = self.current_state
+        if not current_state:
+            self._last_time = 0
+            return False
+        else:
             if self._last_time == 0:
                 self._last_time = time.time()
-            elif (time.time() - self._last_time) > self._threshold:
-                self._value = True
-        else:
-            self._value = False
+                return False
+            if (time.time() - self._last_time) > 0.5:
+                return True
+            return False
+
+    def poll_state(self):
+        self.led.output(self.state)
 
 
 class Base:
