@@ -90,21 +90,23 @@ class Switch:
     @property
     def state(self) -> bool:
         current_state = self.current_state
+        # Currently reading zero
         if not current_state:
+            # reset 'last time active'
             self._last_time = 0
+            # current state is false
             self._last_state = False
-            return False
         else:
-            if self._last_state:
-                return self._last_state
-            if self._last_time == 0:
-                self._last_time = time.time()
-                return False
-            if (time.time() - self._last_time) > 0.5:
-                self._last_time = 0
-                self._last_state = True
-                return True
-            return self._last_state
+            # Currently active
+            if not self._last_state:
+                # But previously inactive
+                if self._last_time == 0:
+                    # Last time was not active - record new active time
+                    self._last_time = time.time()
+                elif (time.time() - self._last_time) > 0.5:
+                    # First active old enough, set new last state
+                    self._last_state = True
+        return self._last_state
 
     def poll_state(self):
         self.led.output(self.state)
