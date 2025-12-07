@@ -1,5 +1,11 @@
+from __future__ import annotations
+
 import time
 
+try:
+    from typing import ClassVar
+except ImportError:
+    pass
 
 from mcp23017 import VirtualPin
 
@@ -111,8 +117,12 @@ class Switch:
 
 
 class Base:
+
+    instances: ClassVar[list[Base]] = []
+
     def __init__(self, *, switches: list[Switch]):
         self.switches = switches
+        self.__class__.instances.append(self)
 
     def poll_switches(self):
         for switch in self.switches:
@@ -121,6 +131,16 @@ class Base:
     def poll_state(self):
         for switch in self.switches:
             switch.poll_state()
+
+    @classmethod
+    def poll_all_switches(cls):
+        for instance in cls.instances:
+            instance.poll_switches()
+
+    @classmethod
+    def poll_all_states(cls):
+        for instance in cls.instances:
+            instance.poll_state()
 
 
 class Turnout(Base):

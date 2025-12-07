@@ -2,7 +2,7 @@ import time
 
 import machine
 
-from units import Turnout, Sidings
+from units import Base, Sidings
 
 from mcp23017 import MCP23017
 
@@ -36,9 +36,9 @@ if True:
         led2=MCP22[1],
         led3=MCP22[2],
         led4=MCP22[3],
-        led5=MCP22[4],    
+        led5=MCP22[4],
     )
-    #sidings = Turnout(
+    # sidings = Turnout(
     #    motor=MCP20[0],
     #    sensor_straight=MCP20[13],
     #    sensor_diverging=MCP20[12],
@@ -46,11 +46,10 @@ if True:
     #    led_straight=MCP20[1],
     #    switch_diverging=MCP20[14],
     #    led_diverging=MCP20[2],
-    #)
-    
+    # )
 
     while True:
-        sidings.poll_switches()
+        Base.poll_switches(sidings)
         time.sleep(0.1)
-        sidings.poll_state()
+        Base.poll_all_states()
         time.sleep(0.1)
