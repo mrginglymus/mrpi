@@ -1,8 +1,7 @@
-from __future__ import annotations
-
 import time
 
 try:
+    from __future__ import annotations
     from typing import ClassVar
 except ImportError:
     pass
@@ -143,11 +142,11 @@ class Base:
             instance.poll_state()
 
     def debug(self):
-        for k, v in self.__dict__.values():
+        for k, v in self.__dict__.items():
             if isinstance(v, Motor):
                 print(k)
                 print("straight: ", [(p._pin, p.value()) for p in v._straight])
-                print("diverging: ", [(p._pin, p.value()) for p in v._straight])
+                print("diverging: ", [(p._pin, p.value()) for p in v._diverging])
 
 
 class Turnout(Base):
