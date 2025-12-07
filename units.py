@@ -142,6 +142,13 @@ class Base:
         for instance in cls.instances:
             instance.poll_state()
 
+    def debug(self):
+        for k, v in self.__dict__.values():
+            if isinstance(v, Motor):
+                print(k)
+                print("straight: ", [(p._pin, p.value()) for p in v._straight])
+                print("diverging: ", [(p._pin, p.value()) for p in v._straight])
+
 
 class Turnout(Base):
     def __init__(
@@ -226,17 +233,19 @@ class Crossover(Base):
         sensor2_diverging: VirtualPin,
         sensor3_straight: VirtualPin,
         sensor3_diverging: VirtualPin,
+        sensor4_straight: VirtualPin,
+        sensor4_diverging: VirtualPin,
     ):
 
         self.motor1 = Motor(
             motor=motor1,
-            straight=[sensor1_straight, sensor3_straight],
-            diverging=[sensor1_diverging, sensor3_diverging],
+            straight=[sensor1_straight, sensor4_straight],
+            diverging=[sensor1_diverging, sensor4_diverging],
         )
         self.motor2 = Motor(
             motor=motor2,
-            straight=[sensor2_straight],
-            diverging=[sensor2_diverging],
+            straight=[sensor2_straight, sensor3_straight],
+            diverging=[sensor2_diverging, sensor3_diverging],
         )
 
         self.switch_straight = Switch(

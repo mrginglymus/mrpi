@@ -13,7 +13,7 @@ MCPT1 = MCP23017(i2c1, address=0x21)
 MCPT2 = MCP23017(i2c1, address=0x24)
 MCPT3 = MCP23017(i2c1, address=0x20)
 MCPB1 = MCP23017(i2c1, address=0x22)
-MCPB2 = MCP23017(i2c1, address=0X23)
+MCPB2 = MCP23017(i2c1, address=0x23)
 
 if True:
     sidings = Sidings(
@@ -52,7 +52,7 @@ if True:
         led_straight=MCPB1[5],
         led_diverging=MCPB1[6],
     )
-    
+
     station_right = PairedTurnout(
         motor=MCPT1[5],
         sensor1_straight=MCPT2[10],
@@ -62,9 +62,9 @@ if True:
         switch_straight=MCPB1[8],
         switch_diverging=MCPB2[15],
         led_straight=MCPB1[7],
-        led_diverging=MCPB2[0]
+        led_diverging=MCPB2[0],
     )
-    
+
     program = Turnout(
         motor=MCPT1[6],
         sensor_straight=MCPT2[1],
@@ -73,8 +73,8 @@ if True:
         switch_diverging=MCPB2[13],
         led_straight=MCPB2[1],
         led_diverging=MCPB2[2],
-        )
-    
+    )
+
     sidings_entrance = Turnout(
         motor=MCPT1[7],
         sensor_straight=MCPT2[3],
@@ -83,8 +83,8 @@ if True:
         switch_diverging=MCPB2[11],
         led_straight=MCPB2[3],
         led_diverging=MCPB2[4],
-        )
-    
+    )
+
     slip = Crossover(
         motor1=MCPT3[0],
         motor2=MCPT3[1],
@@ -101,8 +101,8 @@ if True:
         switch_partial=MCPB2[7],
         led_straight=MCPB2[10],
         led_diverging=MCPB2[9],
-        led_partial=MCPB2[8]
-        )
+        led_partial=MCPB2[8],
+    )
 
     while False:
         Base.poll_all_switches()
