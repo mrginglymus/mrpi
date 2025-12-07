@@ -2,7 +2,7 @@ import time
 
 import machine
 
-from units import Base, Sidings, PairedTurnout
+from units import Base, Sidings, PairedTurnout, Turnout
 
 from mcp23017 import MCP23017
 
@@ -11,7 +11,9 @@ i2c1 = machine.I2C(1)
 
 MCPT1 = MCP23017(i2c1, address=0x21)
 MCPT2 = MCP23017(i2c1, address=0x24)
+MCPT3 = MCP23017(i2c1, address=0x20)
 MCPB1 = MCP23017(i2c1, address=0x22)
+MCPB2 = MCP23017(i2c1, address=0X23)
 
 if True:
     sidings = Sidings(
@@ -50,6 +52,38 @@ if True:
         led_straight=MCPB1[5],
         led_diverging=MCPB1[6],
     )
+    
+    station_right = PairedTurnout(
+        motor=MCPT1[5],
+        sensor1_straight=MCPT2[10],
+        sensor1_diverging=MCPT2[11],
+        sensor2_straight=MCPT2[9],
+        sensor2_diverging=MCPT2[12],
+        switch_straight=MCPB1[8],
+        switch_diverging=MCPB2[15],
+        led_straight=MCPB1[7],
+        led_diverging=MCPB2[0]
+    )
+    
+    program = Turnout(
+        motor=MCPT1[6],
+        sensor_straight=MCPT2[1],
+        sensor_diverging=MCPT2[0],
+        switch_straight=MCPB2[14],
+        switch_diverging=MCPB2[13],
+        led_straight=MCPB2[1],
+        led_diverging=MCPB2[2],
+        )
+    
+    sidings_entrance = Turnout(
+        motor=MCPT1[7],
+        sensor_straight=MCPT2[3],
+        sensor_diverging=MCPT2[2],
+        switch_straight=MCPB2[12],
+        switch_diverging=MCPB2[11],
+        led_straight=MCPB2[3],
+        led_diverging=MCPB2[4],
+        )
 
     while True:
         Base.poll_all_switches()
