@@ -59,6 +59,16 @@ class Motor:
             return "diverging"
         return None
 
+    def debug(self):
+        print(
+            "straight: ",
+            [((8 * p._port._port) + p._pin, p.value()) for p in self._straight],
+        )
+        print(
+            "diverging: ",
+            [((8 * p._port._port) + p._pin, p.value()) for p in self._diverging],
+        )
+
 
 class Switch:
     def __init__(
@@ -143,10 +153,9 @@ class Base:
 
     def debug(self):
         for k, v in self.__dict__.items():
-            if isinstance(v, Motor):
+            if hasattr(v, "debug"):
                 print(k)
-                print("straight: ", [(p._pin, p.value()) for p in v._straight])
-                print("diverging: ", [(p._pin, p.value()) for p in v._diverging])
+                v.debug()
 
 
 class Turnout(Base):
