@@ -2,7 +2,7 @@ import time
 
 import machine
 
-from units import Base, Sidings, PairedTurnout, Turnout
+from units import Base, Sidings, PairedTurnout, Turnout, Crossover
 
 from mcp23017 import MCP23017
 
@@ -84,8 +84,27 @@ if True:
         led_straight=MCPB2[3],
         led_diverging=MCPB2[4],
         )
+    
+    slip = Crossover(
+        motor1=MCPT3[0],
+        motor2=MCPT3[1],
+        sensor1_straight=MCPT2[4],
+        sensor1_diverging=MCPT2[5],
+        sensor2_straight=MCPT2[6],
+        sensor2_diverging=MCPT2[7],
+        sensor3_straight=MCPT3[15],
+        sensor3_diverging=MCPT3[14],
+        sensor4_straight=MCPT3[13],
+        sensor4_diverging=MCPT3[12],
+        switch_straight=MCPB2[5],
+        switch_diverging=MCPB2[6],
+        switch_partial=MCPB2[7],
+        led_straight=MCPB2[10],
+        led_diverging=MCPB2[9],
+        led_partial=MCPB2[8]
+        )
 
-    while True:
+    while False:
         Base.poll_all_switches()
         time.sleep(0.1)
         Base.poll_all_states()
