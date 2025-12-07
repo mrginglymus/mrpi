@@ -9,46 +9,46 @@ from mcp23017 import MCP23017
 i2c1 = machine.I2C(1)
 
 
-MCP20 = MCP23017(i2c1, address=0x20)
-MCP21 = MCP23017(i2c1, address=0x21)
-MCP22 = MCP23017(i2c1, address=0x22)
+MCPT1 = MCP23017(i2c1, address=0x21)
+MCPT2 = MCP23017(i2c1, address=0x24)
+MCPB1 = MCP23017(i2c1, address=0x22)
 
 if True:
     sidings = Sidings(
-        motor1=MCP21[0],
-        motor2=MCP21[1],
-        motor3=MCP21[2],
-        motor4=MCP21[3],
-        sensor1_straight=MCP21[14],
-        sensor1_diverging=MCP21[15],
-        sensor2_straight=MCP21[12],
-        sensor2_diverging=MCP21[13],
-        sensor3_straight=MCP21[10],
-        sensor3_diverging=MCP21[11],
-        sensor4_straight=MCP21[9],
-        sensor4_diverging=MCP21[8],
-        switch1=MCP22[15],
-        switch2=MCP22[14],
-        switch3=MCP22[13],
-        switch4=MCP22[12],
-        switch5=MCP22[11],
-        led1=MCP22[0],
-        led2=MCP22[1],
-        led3=MCP22[2],
-        led4=MCP22[3],
-        led5=MCP22[4],
+        motor1=MCPT1[0],
+        motor2=MCPT1[1],
+        motor3=MCPT1[2],
+        motor4=MCPT1[3],
+        sensor1_straight=MCPT1[14],
+        sensor1_diverging=MCPT1[15],
+        sensor2_straight=MCPT1[12],
+        sensor2_diverging=MCPT1[13],
+        sensor3_straight=MCPT1[10],
+        sensor3_diverging=MCPT1[11],
+        sensor4_straight=MCPT1[9],
+        sensor4_diverging=MCPT1[8],
+        switch1=MCPB1[15],
+        switch2=MCPB1[14],
+        switch3=MCPB1[13],
+        switch4=MCPB1[12],
+        switch5=MCPB1[11],
+        led1=MCPB1[0],
+        led2=MCPB1[1],
+        led3=MCPB1[2],
+        led4=MCPB1[3],
+        led5=MCPB1[4],
     )
-    
+
     station_left = PairedTurnout(
-        motor=MCP21[4],
-        sensor1_straight=MCP20[15],
-        sensor1_diverging=MCP20[14],
-        sensor2_straight=MCP20[12],
-        sensor2_diverging=MCP20[13],
-        switch_straight=MCP22[10],
-        switch_diverging=MCP22[9],
-        led_straight=MCP22[5],
-        led_diverging=MCP22[6]
+        motor=MCPT1[4],
+        sensor1_straight=MCPT2[15],
+        sensor1_diverging=MCPT2[14],
+        sensor2_straight=MCPT2[12],
+        sensor2_diverging=MCPT2[13],
+        switch_straight=MCPB1[10],
+        switch_diverging=MCPB1[9],
+        led_straight=MCPB1[5],
+        led_diverging=MCPB1[6],
     )
 
     while True:
